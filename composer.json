@@ -1,0 +1,21 @@
+{
+    "name": "cfrutos/elastic-sandbox",
+    "description": "An ElasticSearch Sandbox for integration testing",
+    "require": {
+        "guzzlehttp/guzzle": "^6.1",
+        "clue/docker-react": "^0.2.0",
+        "clue/block-react": "^0.3.0",
+        "elasticsearch/elasticsearch": "^2.0"
+    },
+    "authors": [
+        {
+            "name": "Carlos Frutos",
+            "email": "carlos@kiwing.it"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ElasticSandbox\\": "src"
+        }
+    }
+}
