@@ -1,6 +1,7 @@
 {
     "name": "cfrutos/elastic-sandbox",
     "description": "An ElasticSearch Sandbox for integration testing",
+    "keywords": ["elasticsearch", "integration", "testing"],
     "require": {
         "guzzlehttp/guzzle": "4.*",
         "elasticsearch/elasticsearch": "^1.3",

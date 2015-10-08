@@ -7,6 +7,7 @@ use GuzzleHttp\Client as HttpClient;
 use Clue\React\Buzz\Message\ResponseException;
 use function Clue\React\Block\await;
 use Elasticsearch\ClientBuilder as ElasticSearchClientBuilder;
+use GuzzleHttp\Exception\RequestException;
 
 class DockerElasticSearchServer
 {
