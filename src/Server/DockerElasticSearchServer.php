@@ -315,8 +315,14 @@ class DockerElasticSearchServer
         $result = await($promise, $this->eventLoop);
 
         $isAlive = function() {
+            static $existRequestMethod = method_exists($this->httpClient, 'request');
+
             try {
-                $this->httpClient->request('GET', 'http://localhost:' . $this->port());
+                if ($existRequestMethod) {
+                    $this->httpClient->request('GET', 'http://localhost:' . $this->port());
+                } else {
+                    $this->httpClient->get('http://localhost:' . $this->port());
+                }
 
                 return true;
             } catch (RequestException $e) {
