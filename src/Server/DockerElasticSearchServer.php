@@ -315,7 +315,11 @@ class DockerElasticSearchServer
         $result = await($promise, $this->eventLoop);
 
         $isAlive = function() {
-            static $existRequestMethod = method_exists($this->httpClient, 'request');
+            static $existRequestMethod;
+
+            if (is_null($existRequestMethod)) {
+                $existRequestMethod = method_exists($this->httpClient, 'request');
+            }
 
             try {
                 if ($existRequestMethod) {
