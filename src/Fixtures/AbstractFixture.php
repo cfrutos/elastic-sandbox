@@ -33,12 +33,26 @@ abstract class AbstractFixture
             $params['index'] = $this->index;
             $params['type']  = $this->type;
             $params['id'] = $dataItem['id'];
-            unset($data['id']);
+            unset($dataItem['id']);
 
             $params['body'] = $dataItem;
 
             $client->index($params);
         }
+    }
+
+    /**
+     * Set the index name
+     *
+     * @param string $index Index name
+     *
+     * @return self
+     */
+    public function setIndex($index)
+    {
+        $this->index = (string) $index;
+
+        return $this;
     }
 
     /**

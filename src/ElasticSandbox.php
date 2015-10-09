@@ -101,21 +101,25 @@ class ElasticSandbox
     /**
      * Boot the sandbox
      *
+     * @param boolean $force Force to recreate indices and data
+     *
      * @return void
      */
-    public function boot()
+    public function boot($force = false)
     {
+        $force = (boolean) $force;
+
         $this->elasticSearchClient = $this->elasticSearchServer->getClient();
 
         $this->fixtureLoader = new FixtureLoader($this->elasticSearchClient);
         $this->fixtureLoader->loadFromDirectory($this->settings['fixturesPath']);
 
-        if ($this->snapshotExists($this->currentSnapshotName())) {
+        if ($this->snapshotExists($this->currentSnapshotName()) && !$force) {
             $this->restoreBackup();
         } else {
             $this->recreateIndex();
             $this->doAllMappings();
-            $this->fixtureLoader->executeAll();
+            $this->loadData();
             $this->saveBackup();
         }
 
@@ -125,12 +129,16 @@ class ElasticSandbox
     /**
      * Back the ES Sandbox to the initial state
      *
+     * @param boolean $force Force to recreate indices and data
+     *
      * @return void
      */
-    public function reboot()
+    public function reboot($force = false)
     {
-        if (!$this->booted) {
-            $this->boot();
+        $force = (boolean) $force;
+
+        if (!$this->booted || $force) {
+            $this->boot($force);
         } else {
             $this->restoreBackup();
         }
@@ -176,6 +184,20 @@ class ElasticSandbox
 
             $this->elasticSearchClient->indices()->putMapping($params);
         }
+    }
+
+    /**
+     * Load data from fixture loader
+     *
+     * @return void
+     */
+    protected function loadData()
+    {
+        foreach ($this->fixtureLoader->getFixtures() as $fixture) {
+            $fixture->setIndex($this->indexName());
+        }
+
+        $this->fixtureLoader->executeAll();
     }
 
     /**
