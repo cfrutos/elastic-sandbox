@@ -7,6 +7,7 @@ use GuzzleHttp\Client as HttpClient;
 use Clue\React\Buzz\Message\ResponseException;
 use function Clue\React\Block\await;
 use Elasticsearch\ClientBuilder as ElasticSearchClientBuilder;
+use ElasticSearch\Client as ElasticSearchClient;
 use GuzzleHttp\Exception\RequestException;
 
 class DockerElasticSearchServer
@@ -209,9 +210,15 @@ class DockerElasticSearchServer
         if (!$this->elasticSearchClient) {
             $this->prepare();
 
-            $this->elasticSearchClient = ElasticSearchClientBuilder::create()
-                ->setHosts([$this->address()])
-                ->build();
+            if (class_exists(ElasticSearchClientBuilder::class)) {
+                $this->elasticSearchClient = ElasticSearchClientBuilder::create()
+                    ->setHosts([$this->address()])
+                    ->build();
+            } else {
+                $this->elasticSearchClient = new ElasticSearchClient([
+                    'hosts' => [$this->address()]
+                ]);
+            }
         }
 
         return $this->elasticSearchClient;
@@ -403,6 +410,4 @@ class DockerElasticSearchServer
             }
         }
     }
-
-
 }
