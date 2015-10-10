@@ -158,7 +158,15 @@ class ElasticSandbox
             $client->indices()->delete(['index' => $indexName]);
         }
 
-        $client->indices()->create(['index' => $indexName]);
+        $client->indices()->create([
+            'index' => $indexName,
+            'body' => [
+                'index' => [
+                    'number_of_shards' => 1,
+                    'number_of_replicas' => 0
+                ]
+            ]
+        ]);
     }
 
     /**
@@ -258,6 +266,8 @@ class ElasticSandbox
         while (!$this->indexIsOpen()) {
             usleep(5000);
         }
+
+        usleep(1000 * 5);
     }
 
     /**
@@ -265,6 +275,10 @@ class ElasticSandbox
      */
     public function indexIsOpen()
     {
+        if (!$this->elasticSearchClient->ping()) {
+            return false;
+        }
+
         $r = explode(' ', $this->elasticSearchClient->cat()->indices(['index' => $this->indexName()]));
 
         return !empty($r) && (count($r) >= 2) & ($r[1] === 'open');
