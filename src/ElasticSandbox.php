@@ -254,6 +254,20 @@ class ElasticSandbox
         ]);
 
         $client->indices()->open(['index' => $this->indexName()]);
+
+        while (!$this->indexIsOpen()) {
+            usleep(5000);
+        }
+    }
+
+    /**
+     * Check if the index is open
+     */
+    public function indexIsOpen()
+    {
+        $r = explode(' ', $this->elasticSearchClient->cat()->indices(['index' => $this->indexName()]));
+
+        return !empty($r) && (count($r) >= 2) & ($r[1] === 'open');
     }
 
     /**
