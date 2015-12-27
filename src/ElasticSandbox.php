@@ -14,8 +14,6 @@ use ElasticSandbox\Server\DockerElasticSearchServer;
  */
 class ElasticSandbox
 {
-    const ES_IMAGE = 'elasticsearch';
-
     /**
      * @var ElasticSandbox\Fixtures\FixtureLoader
      */

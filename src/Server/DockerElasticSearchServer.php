@@ -238,6 +238,7 @@ class DockerElasticSearchServer
         $container = $this->containerData($this->containerName());
 
         $needsToBeRecreated = !$container || !$this->isWellConfigured($container);
+
         if ($needsToBeRecreated) {
             $this->out('Needs to be recreated');
 
@@ -280,14 +281,18 @@ class DockerElasticSearchServer
     protected function createContainer()
     {
         $containerConfig = [
-            'Image' => static::ES_IMAGE,
+            'Image' => static::ES_IMAGE . ':latest',
             'ExposedPorts' => [
                 "9200/tcp" => null
             ],
             'Volumes' => [
-                '/usr/share/elasticsearch/config' => null,
                 '/usr/share/elasticsearch/data' => null,
-                '/mount/backups' => null
+                '/mount/backups' => null,
+                '/mount/config' => null
+            ],
+            'Cmd' => [
+                '--cluster.name=elasticsandbox',
+                '--path.repo=/mount/backups/'
             ]
         ];
 
@@ -313,9 +318,9 @@ class DockerElasticSearchServer
                 ]
             ],
             "Binds" => [
-                $this->configPath() . ':/usr/share/elasticsearch/config',
                 $this->dataPath() . ':/usr/share/elasticsearch/data',
-                $this->backupPath() . ':/mount/backups'
+                $this->backupPath() . ':/mount/backups',
+                $this->configPath() . ':/mount/config'
             ],
         ]);
 
@@ -371,14 +376,12 @@ class DockerElasticSearchServer
         }
 
         //Check mounted volumes
-        $configVolumeEntry = "{$this->configPath()}:/usr/share/elasticsearch/config";
         $backupVolumeEntry = "{$this->backupPath()}:/mount/backups";
         $dataVolumeEntry = "{$this->dataPath()}:/usr/share/elasticsearch/data";
         $mounts = $containerData['HostConfig']['Binds'];
 
         if (
             (count($mounts) != 3) ||
-            !in_array($configVolumeEntry, $mounts) ||
             !in_array($backupVolumeEntry, $mounts) ||
             !in_array($dataVolumeEntry, $mounts)
         ) {
